@@ -1,0 +1,31 @@
+{
+  "manifest_version": 2,
+  "name": "Twitter Stock Info",
+  "version": "0.1",
+  "icons": {
+        "48": "images/icon.png"
+  },
+  "background": {
+    "scripts": ["hot-reload.js","background.js"]
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "images/icon.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+  {
+    "matches": [
+      "https://twitter.com/search?q=%24*","http://twitter.com/search?q=%24*"
+    ],
+    "js": ["jquery-3.4.1.min.js","plotly-basic.min.js","stocks.js","content.js"]
+    }
+  ],
+  "permissions": [
+    "webNavigation",
+    "tabs",
+    "*://twitter.com/*",
+    "storage"
+  ]
+}
