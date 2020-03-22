@@ -6,7 +6,11 @@
         <script src="popup.js"></script>
         <link rel="stylesheet" type="text/css" href="popup.css">
     </head>
-    <body style="background-color:#ffffff;width:250px;height:200px;">
+    <body style="background-color:#ffffff;width:260px;height:200px;">
+      <div class="container">
+        <div id="title">
+          <h2>Twitter Finance Extension</h2>
+        </div>
         <div id="status">
           <ol id="instructions">
             <li>
@@ -16,8 +20,11 @@
               Paste in your API key to the box below!
             </li>
           </ol>
+        </div>
+        <div id="apiSub">
           <input id="keyInput"></input>
           <button id="sendKey">Enter API Key</button>
         </div>
+      </div>
     </body>
 </html>

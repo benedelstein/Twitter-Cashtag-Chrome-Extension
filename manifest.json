@@ -15,11 +15,12 @@
     "default_popup": "popup.html"
   },
   "content_scripts": [
-  {
-    "matches": [
-      "https://twitter.com/search?q=%24*","http://twitter.com/search?q=%24*"
-    ],
-    "js": ["jquery-3.4.1.min.js","plotly-basic.min.js","stocks.js","content.js"]
+    {
+      "matches": [
+        "https://twitter.com/search?q=%24*","http://twitter.com/search?q=%24*"
+      ],
+      "run_at": "document_end",
+      "js": ["jquery-3.4.1.min.js","plotly-basic.min.js","stocks.js","content.js"]
     }
   ],
   "permissions": [

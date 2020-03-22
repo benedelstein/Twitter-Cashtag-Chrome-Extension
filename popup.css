@@ -1,4 +1,24 @@
+body {
+  margin: 0px;
+}
+#title {
+  text-align: center;
+  color: rgb(29, 161, 242);
+  border-bottom: 1px solid black;
+}
 #status {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
-  font-size: 18px;
+  font-size: 14px;
+}
+#instructions {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  padding-left: auto;
+  padding-right: auto;
+}
+#apiSub {
+  margin: auto;
+  width: 75%;
+  padding: 1px;
 }
