@@ -335,7 +335,6 @@ Stocks.prototype = {
     };
 
 		var result = await this._doRequest(params);
-		console.log(result);
 		return result.bestMatches[0];
 	},
 
@@ -346,7 +345,6 @@ Stocks.prototype = {
 			symbol: options.symbol
 		}
 		var result = await this._doRequest(params);
-		console.log(result);
 		return result['Global Quote'];
 	}
 };
