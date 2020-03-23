@@ -1,7 +1,13 @@
-//$('#getResults').on("click", function() {console.log('clicked');});
-//document.getElementById('getResults').addEventListener(onKeySubmit);
 $(document).ready(function() {
-  $('#sendKey').on("click", onKeySubmit);
+  $('#sendKey').on("click", onKeySubmit); //listen for button press
+  var keydata = 'current API key: ';
+
+  chrome.storage.sync.get(['apiKey'], function(result) {
+    keydata += result.apiKey;
+    console.log(result.apiKey);
+    $('#currentKey').html(keydata);
+  });
+
   function onKeySubmit() {
     let params = {
       active: true,
@@ -9,6 +15,7 @@ $(document).ready(function() {
     }
     let apiKey = $('#keyInput').val().trim();
     if(apiKey.length===16) { // if key is valid
+      /*TODO: check if API KEY is actually valid*/
       chrome.storage.sync.set({apiKey: apiKey},function() {
         console.log('Set user api key to ' + apiKey);
       });
