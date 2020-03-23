@@ -337,6 +337,17 @@ Stocks.prototype = {
 		var result = await this._doRequest(params);
 		console.log(result);
 		return result.bestMatches[0];
+	},
+
+	//used to get daily movement of stock from previous day
+	quoteEndpoint: async function(options={}) {
+		var params = {
+			function: 'GLOBAL_QUOTE',
+			symbol: options.symbol
+		}
+		var result = await this._doRequest(params);
+		console.log(result);
+		return result['Global Quote'];
 	}
 };
 
