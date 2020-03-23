@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name": "Twitter Stock Info",
+  "name": "Twitter Cashtag Extension",
   "version": "0.1",
   "icons": {
         "48": "images/icon.png"
@@ -12,20 +12,20 @@
     "default_icon": {
       "16": "images/icon.png"
     },
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_title": "Twitter Cashtag Extension"
   },
   "content_scripts": [
     {
       "matches": [
         "https://twitter.com/search?q=%24*","http://twitter.com/search?q=%24*"
       ],
-      "run_at": "document_end",
+      "run_at": "document_idle",
       "js": ["jquery-3.4.1.min.js","plotly-basic.min.js","stocks.js","content.js"]
     }
   ],
   "permissions": [
     "webNavigation",
-    "tabs",
     "*://twitter.com/*",
     "storage"
   ]
