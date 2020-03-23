@@ -149,7 +149,7 @@ Stocks.prototype = {
 
     return new Promise((resolve, reject) => {
       var url = this._createUrl(params);
-
+			console.log(url);
       fetch(url).then(function (response) {
         return response.json();
       }).then(function (data) {
@@ -320,7 +320,7 @@ Stocks.prototype = {
 
     return result;
   },
-	
+
 	//search company name from ticker
 	/*
 	options = {
@@ -335,6 +335,7 @@ Stocks.prototype = {
     };
 
 		var result = await this._doRequest(params);
+		console.log(result);
 		return result.bestMatches[0];
 	}
 };
