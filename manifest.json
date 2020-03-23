@@ -21,7 +21,8 @@
         "https://twitter.com/search?q=%24*","http://twitter.com/search?q=%24*"
       ],
       "run_at": "document_idle",
-      "js": ["jquery-3.4.1.min.js","plotly-basic.min.js","stocks.js","content.js"]
+      "js": ["jquery-3.4.1.min.js","plotly-basic.min.js","stocks.js","content.js"],
+      "css": ["content.css"]
     }
   ],
   "permissions": [

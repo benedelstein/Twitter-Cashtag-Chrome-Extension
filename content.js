@@ -30,7 +30,7 @@ function stockInfo(apiKey) {
       //insert new div on side bar
       $("div[class='css-1dbjc4n r-1u4rsef r-9cbz99 r-t23y2h r-1phboty r-rs99b7 r-ku1wi2 r-1udh08x']")
         .before('<div class="stock_info" id="stockinfo"></div>');
-
+      /*
       $('#stockinfo').css({ //setup styling of div
         'height': '280px',
         'width': '349px',
@@ -43,6 +43,7 @@ function stockInfo(apiKey) {
         'z-index': '100',
         'background-color': '#ffffff'
       });
+      */
       try {
         var stocks = new Stocks(apiKey);
       }
@@ -93,6 +94,10 @@ function stockInfo(apiKey) {
         var timeSeries = await stocks.timeSeries(timeSeriesOptions);
         console.log(timeSeries);
 
+        var globalQuote = await stocks.quoteEndpoint({symbol: stock});
+        console.log(globalQuote);
+        var dailyChange = parseFloat(globalQuote['09. change']);
+        var percentChange = globalQuote['10. change percent'];
         if(stock!==companyTicker) { //means invalid ticker
           alert('Invalid Ticker. Make sure you spelled it correctly!');
         }
@@ -101,7 +106,7 @@ function stockInfo(apiKey) {
             setTimeout(request,1000,stock);
         }
         else if(timeSeries.length===0 && tryCount>=4) {
-          $('#stockinfo').html('<h1>Error</h1>');
+          errorMessage();
         }
         else {
           /****Instantiate arrays for time series data*****/
@@ -127,9 +132,6 @@ function stockInfo(apiKey) {
           //console.log(closes);
           //console.log(dates);
           // console.log(dateIndices);
-          console.log('yesterday close: ' + closes[todayData-1]);
-          dailyChange = closes[0]-closes[todayData-1]; //calculate price movement
-          percentChange = (closes[0]-closes[todayData-1])/closes[todayData-1]*100; //percent movement
           var dailyChangeString = '';
           if(dailyChange>=0) {
             dailyChangeString = '+' + dailyChange.toFixed(2);
@@ -138,19 +140,18 @@ function stockInfo(apiKey) {
             dailyChangeString = dailyChange.toFixed(2);
           }
           var googleUrl = `http://google.com/search?q=${stock}&tbm=fin`;
-          var resulthtml = "<div id='stockHeader' style='margin: 8px 10px 2px 15px;'>";
-            resulthtml+= "<h2 style='font-size: 20px;margin: 0px'>"+ companyName
+          var resulthtml = "<div id='stockHeader'>";
+            resulthtml+= "<h2>"+ companyName
               + ' (<a href="' + googleUrl + '" target="_blank">' + stock + '</a>)' + '</h2>'; //html to be added in div
           resulthtml+="</div>"
-          resulthtml+='<span id="price" style="margin-left: 20px; font-size: 24px">' + closes[0].toFixed(2) + '</span>';
-          resulthtml+='<span id="currency" style="margin-left: 3px;font-size: 18px;color: #616161">' + companyCurrency + '</span>';
-          resulthtml+='<span id="priceMovements" style="display: inline-block;width: 20%;margin-left: 5px;margin-right: 10px;width:40px">'
-            resulthtml+='<div id="dailyChange" style="font-size: 12px">' + dailyChangeString+ '</div>';
-            resulthtml+='<div id="percentChange" style="font-size: 12px;">(' + Math.abs(percentChange).toFixed(2) + '%)</div>';
-          resulthtml+='</span>'
-
-
-          //resulthtml+=`<a href="${googleUrl}" target="_blank">google finance</a>`;
+          resulthtml+="<div id='stockPrice'>"
+            resulthtml+='<span id="price" >' + closes[0].toFixed(2) + '</span>';
+            resulthtml+='<span id="currency">' + companyCurrency + '</span>';
+            resulthtml+='<span id="priceMovements">'
+              resulthtml+='<div id="dailyChange">' + dailyChangeString + '</div>';
+              resulthtml+='<div id="percentChange>(' + percentChange + ')</div>';
+            resulthtml+='</span>'
+          resulthtml+='</div>'
           var plot = {
             x: dateIndices,
             y: closes,
@@ -176,7 +177,7 @@ function stockInfo(apiKey) {
               t: 10,
               b: 50,
               l: 30,
-              r: 50
+              r: 30
             },
             font: {
               family: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif'
@@ -184,7 +185,7 @@ function stockInfo(apiKey) {
             xaxis: {
               tickmode: 'array',
               tickvals: dateTicks,
-              ticktext: datesToShow.map(d => { return (new Date(d)).toString().substring(0,10);}),
+              ticktext: datesToShow.map(d => { return (new Date(d)).toString().substring(4,10);}),
               automargin: true,
               showgrid: false
             },
@@ -199,16 +200,13 @@ function stockInfo(apiKey) {
           $('#stockinfo').html(resulthtml);
 
           //change change color based on price movement
-          if(percentChange>0) {
+          if(dailyChange>0) {
             $('#dailyChange').css('color', '#0C9D58');
             $('#percentChange').css('color','#0C9D58');
           } else {
             $('#dailyChange').css('color','#D23F30');
             $('#percentChange').css('color','#D23F30');
           }
-
-          $('#stockinfo').children()
-            .css('font-family','system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif');
           $('#stockinfo').append('<div id="plotly"></div>');
           if($('#plotly').length) {
               Plotly.react('plotly',plotData,layout,{displayModeBar: false});
@@ -216,6 +214,7 @@ function stockInfo(apiKey) {
             console.log('Could not insert plot');
           }
           $('div[class="svg-container"]').css({'display':'block','margin-left':'auto','margin-right':'auto','width':'340px'});
+          $('stockinfo').append('<div id="footer"><p>Click on the ticker to get more info from Google Finance</p></div>');
         }
       }
     }
@@ -226,5 +225,5 @@ function stockInfo(apiKey) {
 }
 //put message in div when an unresolvable error occurs
 function errorMessage() {
-
+  $('#stockinfo').html('<h1>Error</h1>');
 }
