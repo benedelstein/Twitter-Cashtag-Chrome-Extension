@@ -1,5 +1,4 @@
 var INIT_DELAY = 1000;
-var tryCount = 0;
 
 //check if valid api key exists
 chrome.storage.sync.get(['apiKey'], function(result) {
@@ -14,9 +13,6 @@ chrome.storage.sync.get(['apiKey'], function(result) {
 //listen for api key enter message to run script without refreshing page
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    console.log(sender.tab ?
-                "from a content script:" + sender.tab.url :
-                "from the extension");
     if (request.message==="keyIn") {
       stockInfo(request.key);
     }
@@ -30,20 +26,7 @@ function stockInfo(apiKey) {
       //insert new div on side bar
       $("div[class='css-1dbjc4n r-1u4rsef r-9cbz99 r-t23y2h r-1phboty r-rs99b7 r-ku1wi2 r-1udh08x']")
         .before('<div class="stock_info" id="stockinfo"></div>');
-      /*
-      $('#stockinfo').css({ //setup styling of div
-        'height': '280px',
-        'width': '349px',
-        'margin-bottom' : '20px',
-        'margin-top': '0px',
-        'position': 'sticky',
-        'top': '10px',
-        'border-radius': '12px',
-        'border': '1px solid #E6ECF0',
-        'z-index': '100',
-        'background-color': '#ffffff'
-      });
-      */
+
       try {
         var stocks = new Stocks(apiKey);
       }
@@ -66,11 +49,11 @@ function stockInfo(apiKey) {
         var currentMins = now.getMinutes();
         var currentDayOfWeek = now.getDay();
         var todayData;
-        if(currentHr>16 || currentDayOfWeek===0 || currentDayOfWeek===6) { //
+        if(currentHr>=16 || currentDayOfWeek===0 || currentDayOfWeek===6) { //
           todayData = 14;
         }
         else {
-          todayData = currentHr - 9;
+          todayData = 2*(currentHr - 9);
         }
         if(currentMins>30 && (currentHr<16 && currentHr>9)) { //if it's past half hour add another data point
           todayData+=1;
@@ -87,25 +70,23 @@ function stockInfo(apiKey) {
         //get json info
         var companyInfo = await stocks.searchEndpoint({keywords: stock});
         console.log(companyInfo);
-        companyTicker = companyInfo['1. symbol'];
-        companyName = companyInfo['2. name'];
-        companyCurrency = companyInfo['8. currency'];
-
+        var globalQuote = await stocks.quoteEndpoint({symbol: stock});
+        console.log(globalQuote);
         var timeSeries = await stocks.timeSeries(timeSeriesOptions);
         console.log(timeSeries);
 
-        var globalQuote = await stocks.quoteEndpoint({symbol: stock});
-        console.log(globalQuote);
-        var dailyChange = parseFloat(globalQuote['09. change']);
-        var percentChange = globalQuote['10. change percent'];
+        if(typeof companyInfo ==='undefined' || typeof timeSeries === 'undefined' || typeof globalQuote==='undefined') {
+          errorMessage();
+          return;
+        }
+        companyTicker = companyInfo['1. symbol'];
+        companyName = companyInfo['2. name'];
+        companyCurrency = companyInfo['8. currency'];
+        var lastClose = parseFloat(globalQuote['08. previous close']);
+
+
         if(stock!==companyTicker) { //means invalid ticker
           alert('Invalid Ticker. Make sure you spelled it correctly!');
-        }
-        else if(timeSeries.length===0 && tryCount<4) {
-          console.log('Got no data. retry');
-            setTimeout(request,1000,stock);
-        }
-        else if(timeSeries.length===0 && tryCount>=4) {
           errorMessage();
         }
         else {
@@ -132,6 +113,11 @@ function stockInfo(apiKey) {
           //console.log(closes);
           //console.log(dates);
           // console.log(dateIndices);
+
+          /******calculate price movements *****/
+          var dailyChange = closes[0] - lastClose;
+          var percentChange = dailyChange/lastClose*100;
+
           var dailyChangeString = '';
           if(dailyChange>=0) {
             dailyChangeString = '+' + dailyChange.toFixed(2);
@@ -139,7 +125,10 @@ function stockInfo(apiKey) {
           else {
             dailyChangeString = dailyChange.toFixed(2);
           }
-          var googleUrl = `http://google.com/search?q=${stock}&tbm=fin`;
+
+          var googleUrl = `http://google.com/search?q=${stock}&tbm=fin`; //google finance link
+
+          /* HTML string to be injected into stockinfo div */
           var resulthtml = "<div id='stockHeader'>";
             resulthtml+= "<h2>"+ companyName
               + ' (<a href="' + googleUrl + '" target="_blank">' + stock + '</a>)' + '</h2>'; //html to be added in div
@@ -149,9 +138,10 @@ function stockInfo(apiKey) {
             resulthtml+='<span id="currency">' + companyCurrency + '</span>';
             resulthtml+='<span id="priceMovements">'
               resulthtml+='<div id="dailyChange">' + dailyChangeString + '</div>';
-              resulthtml+='<div id="percentChange>(' + percentChange + ')</div>';
+              resulthtml+='<div id="percentChange">(' + percentChange.toFixed(2) + '%)</div>';
             resulthtml+='</span>'
           resulthtml+='</div>'
+
           var plot = {
             x: dateIndices,
             y: closes,
@@ -169,6 +159,7 @@ function stockInfo(apiKey) {
             datesToShow.push(dates[i]);
           }
           console.log(datesToShow);
+
           var layout = {
             hovermode: "x",
             height: 200,
@@ -194,8 +185,6 @@ function stockInfo(apiKey) {
             }
           };
 
-          var plotData = [plot]; //put data into array so it can be plotted
-
           //inject html into page
           $('#stockinfo').html(resulthtml);
 
@@ -209,12 +198,12 @@ function stockInfo(apiKey) {
           }
           $('#stockinfo').append('<div id="plotly"></div>');
           if($('#plotly').length) {
-              Plotly.react('plotly',plotData,layout,{displayModeBar: false});
+              Plotly.react('plotly',[plot],layout,{displayModeBar: false});
           } else {
             console.log('Could not insert plot');
+            /**TODO: insert plot error image */
           }
-          $('div[class="svg-container"]').css({'display':'block','margin-left':'auto','margin-right':'auto','width':'340px'});
-          $('stockinfo').append('<div id="footer"><p>Click on the ticker to get more info from Google Finance</p></div>');
+          $('stockinfo').append('<div id="footer">Click on the ticker to get more info from Google Finance</div>');
         }
       }
     }

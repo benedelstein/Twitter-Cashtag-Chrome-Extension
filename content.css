@@ -3,7 +3,7 @@
   height: 280px;
   width: 349px;
   margin-bottom: 20px;
-  margin-top: 0px,
+  margin-top: 0px;
   position: sticky;
   top: 10px;
   border-radius: 12px;
@@ -13,11 +13,8 @@
 }
 
 #stockHeader {
-  padding: 10px 10px 10px 20px;
+  padding: 10px 10px 8px 20px;
   border-bottom: 1px solid rgb(230, 236, 240);
-}
-
-#stockHeader h2 {
   font-size: 20px;
   margin: 0px;
 }
@@ -35,11 +32,10 @@
 
 #priceMovements {
   display: inline-block;
-  width: 20%;
   margin-left: 10px;
   margin-right: 10px;
-  width:40px;
-  font-size: 12px;
+  width: 40px;
+  font-size: 11px;
 }
 
 #stockHeader a:hover {
@@ -50,6 +46,23 @@
 #stockHeader a:link {
   color: black;
   text-decoration: none;
+}
+
+#stockHeader a:visited {
+  color: black;
+  text-decoration: none;
+}
+
+#percentChange {
+  width: auto;
+  height: auto;
+}
+
+div[class*="svg-container"] {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 340px;
 }
 
 #stockinfo #footer {
