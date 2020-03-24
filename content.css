@@ -6,54 +6,64 @@
   margin-top: 0px;
   position: sticky;
   top: 10px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid #E6ECF0;
   z-index: 100;
   background-color: #ffffff;
 }
 
 #stockHeader {
-  padding: 10px 10px 8px 20px;
-  border-bottom: 1px solid rgb(230, 236, 240);
+  padding: 10px 10px 8px 16px;
+  color: #212121;
   font-size: 20px;
+  border-bottom: 1px solid rgb(230, 236, 240);
   margin: 0px;
+  font-weight: 700;
+}
+
+#stockPrice {
+  margin-top: 2px;
+  margin-left: 20px;
 }
 
 #price {
-  margin-left: 20px;
   font-size: 24px;
+  color: #212121;
 }
 
 #currency {
   margin-left: 3px;
-  font-size: 16px;
+  font-size: 15px;
   color: #616161;
 }
 
 #priceMovements {
   display: inline-block;
-  margin-left: 10px;
+  margin-left: 4px;
   margin-right: 10px;
-  width: 40px;
-  font-size: 11px;
+  font-size: 15px;
 }
 
-#stockHeader a:hover {
-  color: rgb(29, 161, 242);
-  text-decoration: underline;
-}
+
+  /*color: rgb(29, 161, 242);*/
 
 #stockHeader a:link {
-  color: black;
+  color: #212121;
   text-decoration: none;
 }
 
 #stockHeader a:visited {
-  color: black;
+  color: #212121;
+  text-decoration: none;
+}
+
+#stockHeader a:hover {
+  color: rgb(29,161,242);
   text-decoration: none;
 }
 
 #percentChange {
+  margin-left: 3px;
   width: auto;
   height: auto;
 }
@@ -62,9 +72,14 @@ div[class*="svg-container"] {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 340px;
 }
 
 #stockinfo #footer {
-  margin-top: 20px;
+  text-align: center;
+  font-size: 8px;
+  color: #616161;
+}
+
+#error {
+  text-align: center;
 }
