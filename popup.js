@@ -1,14 +1,16 @@
 $(document).ready(function() {
   $('#sendKey').on("click", onKeySubmit); //listen for button press
-  var keydata = 'current API key: ';
-
   chrome.storage.sync.get(['apiKey'], function(result) {
-    keydata += result.apiKey;
-    console.log(result.apiKey);
-    $('#currentKey').html(keydata);
+    var keyData;
+    if(result.apiKey) {
+      keyData = 'current API key: ' + result.apiKey;
+    } else {
+      keyData = 'You haven\'t entered an API key yet.';
+    }
+    $('#currentKey').html(keyData);
   });
 
-  function onKeySubmit() {
+  function onKeySubmit() { //function run when submit button is pressed
     let params = {
       active: true,
       currentWindow: true
