@@ -43,6 +43,7 @@ function stockInfo(apiKey) {
       request(ticker); //call async stocks function
 
       async function request(stock) {
+        var skipPrices = false;
         var skipGraph = false; //flag to skip graph if no data received
         var now = new Date();
         var currentHr = now.getHours();
@@ -67,68 +68,103 @@ function stockInfo(apiKey) {
         amount: dataAmount
         };
 
+        /* HTML string to be injected into stockinfo div */
+        var resulthtml = "<div id='stockHeader'>";
+        resulthtml+="</div>"
+        resulthtml+="<div id='stockPrice'>"
+          //resulthtml+='<span id="price" >' + closes[0].toFixed(2) + '</span>';
+          //resulthtml+='<span id="currency">' + companyCurrency + '</span>';
+          //resulthtml+='<span id="priceMovements">'
+            //resulthtml+='<span id="dailyChange">' + dailyChangeString + '</span>';
+            //resulthtml+='<span id="percentChange">(' + Math.abs(percentChange).toFixed(2) + '%)</span>';
+          //resulthtml+='</span>'
+        resulthtml+='</div>'
+        //inject html into page
+        $('#stockinfo').html(resulthtml);
+
         //get json info
         var companyInfo = await stocks.searchEndpoint({keywords: stock});
         console.log(companyInfo);
-        var globalQuote = await stocks.quoteEndpoint({symbol: stock});
-        console.log(globalQuote);
-        var timeSeries = await stocks.timeSeries(timeSeriesOptions);
-        console.log(timeSeries);
-
-        if(typeof companyInfo ==='undefined' || typeof timeSeries === 'undefined' || typeof globalQuote==='undefined') {
+        if(typeof companyInfo==='undefined') {
           errorMessage();
           return;
         }
-        if(timeSeries.length===0) {
-          skipGraph = true;
+        var companyTicker = companyInfo['1. symbol'];
+        var companyName = companyInfo['2. name'];
+        var companyCurrency = companyInfo['8. currency'];
+
+        if(companyTicker!==stock) { //autocorrect ticker misspellings
+          stock = companyTicker;
+          console.log('autocorrecting to ' + companyTicker + ' : ' + companyName);
         }
-        companyTicker = companyInfo['1. symbol'];
-        companyName = companyInfo['2. name'];
-        companyCurrency = companyInfo['8. currency'];
-        var lastClose = parseFloat(globalQuote['08. previous close']);
+        var googleUrl = `http://google.com/search?q=${stock}&tbm=fin`; //google finance link
 
+        var headerHtml = companyName + ' (<a href="' + googleUrl +
+          '" target="_blank">' + stock + '</a>)'
+        $('#stockHeader').append(headerHtml);
 
-        if(stock!==companyTicker) { //means invalid ticker
-          alert('Invalid Ticker. Make sure you spelled it correctly!');
-          errorMessage();
+        var globalQuote = await stocks.quoteEndpoint({symbol: stock});
+        var gotGlobalQuote; //flag for if we got good quote data
+        console.log(globalQuote);
+        if(typeof globalQuote=== 'undefined') {
+          gotGlobalQuote = false;
+        } else {
+          gotGlobalQuote = true;
+          var lastClose = parseFloat(globalQuote['08. previous close']);
         }
-        else {
-          /****Instantiate arrays for time series data*****/
-          var dailyChange;
-          var percentChange;
-          var opens = [];
-          var closes = [];
-          var highs = [];
-          var lows = [];
-          var volumes = [];
-          var dates = [];
-          var dateIndices = [];
+        var timeSeries = await stocks.timeSeries(timeSeriesOptions);
+        console.log(timeSeries);
 
-          if(!skipGraph) {
-            //extract data into arrays
-            for(var i = 0; i<timeSeries.length; i++) {
-              opens.push(timeSeries[i].open);
-              closes.push(timeSeries[i].close);
-              highs.push(timeSeries[i].high);
-              lows.push(timeSeries[i].low);
-              volumes.push(timeSeries[i].volume);
-              dates.push(timeSeries[i].date);
-              dateIndices.push(timeSeries.length-1-i); //used to set x-axis on plot
-            }
-            // console.log(opens);
-            //console.log(closes);
-            //console.log(dates);
-            // console.log(dateIndices);
+        if(timeSeries.length===0 || typeof timeSeries==='undefined') {
+          skipGraph = true; //if you don't have time series data you can't graph
+          console.log('no time series data');
+        } else if(timeSeries.length !==dataAmount) {
+          console.log('data mismatch: ' + dataAmount + ' requested vs. ' + timeSeries.length + ' received');
+        }
 
-            /******calculate price movements *****/
-            dailyChange = closes[0] - lastClose;
-            percentChange = dailyChange/lastClose*100;
-          } else {
-            dailyChange = 0;
-            percentChange = 0;
-            closes[0] = 0;
+        /****Instantiate variables for time series data*****/
+        var closePrice;
+        var dailyChange;
+        var percentChange;
+        var opens = [];
+        var closes = [];
+        var highs = [];
+        var lows = [];
+        var volumes = [];
+        var dates = [];
+        var dateIndices = [];
+
+        if(!skipGraph) {
+          //extract data into arrays
+          for(var i = 0; i<timeSeries.length; i++) {
+            opens.push(timeSeries[i].open);
+            closes.push(timeSeries[i].close);
+            highs.push(timeSeries[i].high);
+            lows.push(timeSeries[i].low);
+            volumes.push(timeSeries[i].volume);
+            dates.push(timeSeries[i].date);
+            dateIndices.push(timeSeries.length-1-i); //used to set x-axis on plot
           }
+          closePrice = closes[0];
+          /******calculate price movements *****/
+          dailyChange = closePrice - lastClose;
+          percentChange = dailyChange/lastClose*100;
+        } else {
+          if(!gotGlobalQuote) {
+            dailyChange = parseFloat(globalQuote['09. change']);
+            percentChange = globalQuote['10. change percent'];
+            percentChange = parseFloat(percentChange.substring(0,percentChange.length-1));
+            closePrice = parseFloat(globalQuote['05. price']);
+          } else {
+            skipPrices = true; //if no time series data and no global quote, then there's nothing to display in this div
+          }
+        }
 
+        if(!skipPrices) {
+          var priceSpan = '<span id="price" >' + closePrice.toFixed(2) + '</span>';
+          var currencySpan = '<span id="currency">' + companyCurrency + '</span>';
+          $('#stockPrice').append(priceSpan);
+          $('#stockPrice').append(currencySpan);
           var dailyChangeString = '';
           if(dailyChange>=0) { //format daily change string
             dailyChangeString = '+' + dailyChange.toFixed(2);
@@ -136,90 +172,78 @@ function stockInfo(apiKey) {
           else {
             dailyChangeString = dailyChange.toFixed(2);
           }
-
-          var googleUrl = `http://google.com/search?q=${stock}&tbm=fin`; //google finance link
-
-          /* HTML string to be injected into stockinfo div */
-          var resulthtml = "<div id='stockHeader'>";
-            resulthtml+=companyName
-              + ' (<a href="' + googleUrl + '" target="_blank">' + stock + '</a>)'; //html to be added in div
-          resulthtml+="</div>"
-          resulthtml+="<div id='stockPrice'>"
-            resulthtml+='<span id="price" >' + closes[0].toFixed(2) + '</span>';
-            resulthtml+='<span id="currency">' + companyCurrency + '</span>';
-            resulthtml+='<span id="priceMovements">'
-              resulthtml+='<span id="dailyChange">' + dailyChangeString + '</span>';
-              resulthtml+='<span id="percentChange">(' + Math.abs(percentChange).toFixed(2) + '%)</span>';
-            resulthtml+='</span>'
-          resulthtml+='</div>'
-          //inject html into page
-          $('#stockinfo').html(resulthtml);
+          var dailyChangeSpan = '<span id="dailyChange">' + dailyChangeString + '</span>';
+          var percentChangeSpan = '<span id="percentChange">(' + Math.abs(percentChange).toFixed(2) + '%)</span>';
+          $('#stockPrice').append('<span id="priceMovements"></span>')
+          $('#priceMovements').append(dailyChangeSpan);
+          $('#priceMovements').append(percentChangeSpan);
           //change change color based on price movement
-          if(dailyChange>0) {
+          if(dailyChange>=0) {
             $('#dailyChange').css('color', '#0C9D58');
             $('#percentChange').css('color','#0C9D58');
           } else {
             $('#dailyChange').css('color','#D23F30');
             $('#percentChange').css('color','#D23F30');
           }
-          $('#stockinfo').append('<div id="plotly"></div>');
-          if(!skipGraph) {
-            var plot = {
-              x: dateIndices,
-              y: closes,
-              text: dates.map(d => { return (new Date(d)).toString().substring(0,21);}),
-              type: 'scatter',
-              mode: 'lines'
-            };
-
-            var desiredTicks = 3;
-            var divisor = Math.floor(dataAmount/desiredTicks);
-            var dateTicks = dateIndices.filter(d=>d%divisor===0);
-            var datesToShow =[];
-            console.log(dateTicks);
-            for(var i=0;i<dates.length;i+=divisor) {
-              datesToShow.push(dates[i]);
-            }
-            console.log(datesToShow);
-
-            var layout = {
-              hovermode: "x",
-              height: 180,
-              width: 340,
-              margin: {
-                t: 15,
-                b: 10,
-                l: 30,
-                r: 30
-              },
-              font: {
-                family: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif'
-              },
-              xaxis: {
-                tickmode: 'array',
-                tickvals: dateTicks,
-                ticktext: datesToShow.map(d => { return (new Date(d)).toString().substring(4,10);}),
-                automargin: true,
-                showgrid: false,
-                showline: true
-              },
-              yaxis: {
-                nticks: 5,
-                showline: false
-              }
-            };
-
-            if($('#plotly').length) {
-                Plotly.react('plotly',[plot],layout,{displayModeBar: false});
-            } else {
-              console.log('Could not insert plot');
-              /**TODO: insert plot error image */
-            }
-          } else {
-            $('#plotly').html('<div id="nograph">Could not insert graph</div>');
-          }
-          $('#stockinfo').append('<div id="footer">Click on the ticker to get more info from Google Finance</div>');
         }
+
+        $('#stockinfo').append('<div id="plotly"></div>');
+        if(!skipGraph) {
+          var plot = {
+            x: dateIndices,
+            y: closes,
+            text: dates.map(d => { return (new Date(d)).toString().substring(0,21);}),
+            type: 'scatter',
+            mode: 'lines'
+          };
+
+          var desiredTicks = 3;
+          var divisor = Math.floor(dataAmount/desiredTicks);
+          var dateTicks = dateIndices.filter(d=>d%divisor===0);
+          var datesToShow =[];
+          console.log(dateTicks);
+          for(var i=0;i<dates.length;i+=divisor) {
+            datesToShow.push(dates[i]);
+          }
+          console.log(datesToShow);
+
+          var layout = {
+            hovermode: "x",
+            height: 180,
+            width: 349,
+            margin: {
+              t: 15,
+              b: 10,
+              l: 30,
+              r: 30
+            },
+            font: {
+              family: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif'
+            },
+            xaxis: {
+              tickmode: 'array',
+              tickvals: dateTicks,
+              ticktext: datesToShow.map(d => { return (new Date(d)).toString().substring(4,10);}),
+              automargin: true,
+              showgrid: false,
+              showline: false
+            },
+            yaxis: {
+              nticks: 5,
+              showline: false
+            }
+          };
+
+          if($('#plotly').length) {
+              Plotly.react('plotly',[plot],layout,{displayModeBar: false});
+          } else {
+            console.log('Could not insert plot');
+            /**TODO: insert plot error image */
+          }
+        } else {
+          $('#plotly').html('<div id="nograph">Could not insert graph</div>');
+        }
+        $('#stockinfo').append('<div id="footer">Click on ticker to get more info from Google Finance</div>');
       }
     }
     else {
@@ -229,5 +253,5 @@ function stockInfo(apiKey) {
 }
 //put message in div when an unresolvable error occurs
 function errorMessage() {
-  $('#stockinfo').html('<div id="error"><h1>Error</h1></div>');
+  $('#stockinfo').html('<div id="error"><h1>error</h1></div>');
 }
