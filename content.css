@@ -23,7 +23,7 @@
 
 #stockPrice {
   margin-top: 2px;
-  margin-left: 20px;
+  margin-left: 25px;
 }
 
 #price {
@@ -43,9 +43,6 @@
   margin-right: 10px;
   font-size: 15px;
 }
-
-
-  /*color: rgb(29, 161, 242);*/
 
 #stockHeader a:link {
   color: #212121;
@@ -78,8 +75,15 @@ div[class*="svg-container"] {
   text-align: center;
   font-size: 8px;
   color: #616161;
+  margin-top: 3px;
+}
+
+#nograph {
+  text-align: center;
+  vertical-align: middle;
 }
 
 #error {
   text-align: center;
+  vertical-align: middle;
 }
