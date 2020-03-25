@@ -1,6 +1,10 @@
 body {
   margin: 0px;
+  background-color:#ffffff;
+  width:260px;
+  height:200px;
 }
+
 #title {
   text-align: center;
   color: rgb(29, 161, 242);
