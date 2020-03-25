@@ -4,7 +4,9 @@ This is a chrome extension for Twitter Cashtags.
 
 Twitter announced cashtags back in 2012, but hasn't done much with them in the 8 years they've been around. Just like with a hashtag, you can use the $ symbol in your tweets to track specific equities (e.g. $TSLA or $SPY). It's helpful to see what people are saying about certain stocks, but unless you happen to know the ticker name, you have no idea what these tweets are talking about.
 
-I created a chrome extension to give more info on these cashtags. Just click on a cashtag, and you'll get taken to the regular Twitter search page, but with a special side bar that shows you the company name, price, increase/decrease, and 5 day graph.
+So many people use twitter for finance/trading, so why isn't there a better interface for cashtags?
+
+I created a chrome extension to give more info on these tags. Just click on a cashtag, and you'll get taken to the regular Twitter search page, but with a special side bar that shows you the company name, price, increase/decrease, and 5 day graph.
 
 Before you can get started, you'll need to download the chrome extension from <a href="#" target="_blank">here</a> get an API key from <a href="https://www.alphavantage.co/support/#api-key" target="_blank">here</a>. It's free and takes just a minute to get one! Then enter that key in the extension's popup window, and you'll be good to go!
 
