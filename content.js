@@ -233,7 +233,7 @@ function stockInfo(apiKey) {
             /**TODO: insert plot error image */
           }
         } else {
-          $('#plotly').html('<div id="nograph">Could not insert graph</div>');
+          $('#plotly').html('<div id="nograph">Could not insert graph<br><p>Wait a minute and try again</p></div>');
         }
         $('#stockinfo').append('<div id="footer">Click on the ticker to get more info from Google Finance</div>');
       }

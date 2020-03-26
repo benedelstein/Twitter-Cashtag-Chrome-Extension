@@ -85,10 +85,17 @@ div[class*="svg-container"] {
 }
 
 #nograph {
+  color: #212121;
   text-align: center;
   vertical-align: middle;
   padding-top: 50px;
   padding-bottom: 50px;
+}
+
+#nograph p {
+  font-size: 10px;
+  margin-top: 3px;
+  margin-bottom: 0px;
 }
 
 #error {
