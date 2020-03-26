@@ -2,27 +2,89 @@ body {
   margin: 0px;
   background-color:#ffffff;
   width:260px;
-  height:200px;
+  height:auto;
 }
 
 #title {
-  text-align: center;
-  color: rgb(29, 161, 242);
-  border-bottom: 1px solid rgb(230, 236, 240);
+  margin-top: 5px;
 }
-#status {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
-  font-size: 14px;
-}
-#instructions {
+
+#title img {
+  width: 56px;
+  height: 56px;
+  display: block;
   margin-left: auto;
   margin-right: auto;
-  display: block;
-  padding-left: auto;
-  padding-right: auto;
+}
+#container {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
+}
+
+#instructions {
+  margin-left: 15px;
+  margin-top: 6px;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  color: #424242;
+  width: 220px;
 }
 #apiSub {
+  display: flex;
   margin: auto;
-  width: 75%;
-  padding: 1px;
+  width: 100%;
+  height: 25px;
+}
+
+#keyInput {
+  border-radius: 15px;
+  box-sizing: border-box;
+  border-width: .5px;
+  border-color: #999999;
+  border-style: solid;
+  width: 150px;
+  margin-left: 14px;
+  padding-left: 8px;
+  outline: none;
+  color: #212121;
+}
+
+#submitButton {
+  width: 63px;
+  margin-left: 9px;
+  border-radius: 15px;
+  border-width: 0px;
+  color: #ffffff;
+  background-color: #1DA1F2;
+  font-style: normal;
+  font-weight: 500;
+  text-align: center;
+  vertical-align: middle;
+  transition-duration: .4s;
+  text-decoration: none;
+  outline: none;
+}
+
+#submitButton:hover {
+  text-decoration: none;
+  background-color: #1D59F2;
+  cursor: pointer;
+}
+
+#currentKey {
+  margin-top: 7px;
+  font-weight: 300;
+  font-size: 10px;
+  color: #717171;
+  text-align: center;
+}
+
+#help {
+  text-align: center;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 8px;
+  margin-top: 12px;
+  margin-bottom: 15px;
+  color: #AEAEAE;
 }
