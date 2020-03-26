@@ -6,7 +6,7 @@
         "48": "images/icon_128.png"
   },
   "background": {
-    "scripts": ["hot-reload.js","background.js"]
+    "scripts": ["background.js"]
   },
   "browser_action": {
     "default_icon": {
@@ -26,7 +26,7 @@
     }
   ],
   "web_accessible_resources": [
-            "images/alert.png"  
+            "images/alert.png"
        ],
   "permissions": [
     "webNavigation",
