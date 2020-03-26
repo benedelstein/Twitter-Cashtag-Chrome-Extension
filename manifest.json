@@ -25,6 +25,9 @@
       "css": ["content.css"]
     }
   ],
+  "web_accessible_resources": [
+            "images/alert.png"  
+       ],
   "permissions": [
     "webNavigation",
     "*://twitter.com/*",
