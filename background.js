@@ -5,5 +5,6 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(function(details) { //wai
     chrome.tabs.executeScript(null,{file:"plotly-basic.min.js"}); //then plotly
     chrome.tabs.executeScript(null,{file:"stocks.js"}); //then stocks
     chrome.tabs.executeScript(null,{file:"content.js"}); //finally re-run content script
+    chrome.tabs.insertCSS(null,{file:"content.css"});
   }
 });
