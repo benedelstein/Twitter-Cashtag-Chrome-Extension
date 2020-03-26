@@ -62,23 +62,9 @@ function stockInfo(apiKey) {
         console.log('Data for today: ' + todayData);
         var dataAmount = 13*4 + todayData;
 
-        var timeSeriesOptions = {
-        symbol: stock,
-        interval: '30min',
-        amount: dataAmount
-        };
-
         /* HTML string to be injected into stockinfo div */
-        var resulthtml = "<div id='stockHeader'>";
-        resulthtml+="</div>"
-        resulthtml+="<div id='stockPrice'>"
-          //resulthtml+='<span id="price" >' + closes[0].toFixed(2) + '</span>';
-          //resulthtml+='<span id="currency">' + companyCurrency + '</span>';
-          //resulthtml+='<span id="priceMovements">'
-            //resulthtml+='<span id="dailyChange">' + dailyChangeString + '</span>';
-            //resulthtml+='<span id="percentChange">(' + Math.abs(percentChange).toFixed(2) + '%)</span>';
-          //resulthtml+='</span>'
-        resulthtml+='</div>'
+        var resulthtml = "<div id='stockHeader'></div>";
+        resulthtml+="<div id='stockPrice'></div>";
         //inject html into page
         $('#stockinfo').html(resulthtml);
 
@@ -112,6 +98,12 @@ function stockInfo(apiKey) {
           gotGlobalQuote = true;
           var lastClose = parseFloat(globalQuote['08. previous close']);
         }
+
+        var timeSeriesOptions = {
+        symbol: stock,
+        interval: '30min',
+        amount: dataAmount
+        };
         var timeSeries = await stocks.timeSeries(timeSeriesOptions);
         console.log(timeSeries);
 
@@ -150,7 +142,7 @@ function stockInfo(apiKey) {
           dailyChange = closePrice - lastClose;
           percentChange = dailyChange/lastClose*100;
         } else {
-          if(!gotGlobalQuote) {
+          if(gotGlobalQuote) {
             dailyChange = parseFloat(globalQuote['09. change']);
             percentChange = globalQuote['10. change percent'];
             percentChange = parseFloat(percentChange.substring(0,percentChange.length-1));
@@ -214,8 +206,8 @@ function stockInfo(apiKey) {
             margin: {
               t: 15,
               b: 10,
-              l: 30,
-              r: 30
+              l: 35,
+              r: 35
             },
             font: {
               family: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif'
@@ -243,7 +235,7 @@ function stockInfo(apiKey) {
         } else {
           $('#plotly').html('<div id="nograph">Could not insert graph</div>');
         }
-        $('#stockinfo').append('<div id="footer">Click on ticker to get more info from Google Finance</div>');
+        $('#stockinfo').append('<div id="footer">Click on the ticker to get more info from Google Finance</div>');
       }
     }
     else {
@@ -253,5 +245,8 @@ function stockInfo(apiKey) {
 }
 //put message in div when an unresolvable error occurs
 function errorMessage() {
+  var alertUrl = chrome.extension.getURL("images/alert.png");
+  var alertHtml = `<img class="alertImage" src="${alertUrl}"></img>`;
   $('#stockinfo').html('<div id="error"><h1>error</h1></div>');
+  $('#error').prepend(alertHtml);
 }
