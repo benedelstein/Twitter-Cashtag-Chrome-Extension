@@ -149,7 +149,7 @@ Stocks.prototype = {
 
     return new Promise((resolve, reject) => {
       var url = this._createUrl(params);
-			console.log(url);
+			//console.log(url);
       fetch(url).then(function (response) {
         return response.json();
       }).then(function (data) {

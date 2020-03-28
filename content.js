@@ -38,7 +38,6 @@ function stockInfo(apiKey) {
 
       let fullticker = $("input[aria-label='Search query']").val().trim(); //extract ticker from search bar
       ticker = fullticker.substring(1,fullticker.length).toUpperCase(); //take out $
-      //console.log(ticker);
 
       request(ticker); //call async stocks function
 
@@ -59,7 +58,6 @@ function stockInfo(apiKey) {
         if(currentMins>30 && (currentHr<16 && currentHr>9)) { //if it's past half hour add another data point
           todayData+=1;
         }
-        console.log('Data for today: ' + todayData);
         var dataAmount = 13*4 + todayData;
 
         /* HTML string to be injected into stockinfo div */
@@ -70,7 +68,6 @@ function stockInfo(apiKey) {
 
         //get json info
         var companyInfo = await stocks.searchEndpoint({keywords: stock});
-        console.log(companyInfo);
         if(typeof companyInfo==='undefined') {
           errorMessage();
           return;
@@ -81,7 +78,6 @@ function stockInfo(apiKey) {
 
         if(companyTicker!==stock) { //autocorrect ticker misspellings
           stock = companyTicker;
-          console.log('autocorrecting to ' + companyTicker + ' : ' + companyName);
         }
         var googleUrl = `http://google.com/search?q=${stock}&tbm=fin`; //google finance link
 
@@ -91,7 +87,6 @@ function stockInfo(apiKey) {
 
         var globalQuote = await stocks.quoteEndpoint({symbol: stock});
         var gotGlobalQuote; //flag for if we got good quote data
-        console.log(globalQuote);
         if(typeof globalQuote=== 'undefined') {
           gotGlobalQuote = false;
         } else {
@@ -105,13 +100,11 @@ function stockInfo(apiKey) {
         amount: dataAmount
         };
         var timeSeries = await stocks.timeSeries(timeSeriesOptions);
-        console.log(timeSeries);
 
         if(timeSeries.length===0 || typeof timeSeries==='undefined') {
           skipGraph = true; //if you don't have time series data you can't graph
-          console.log('no time series data');
         } else if(timeSeries.length !==dataAmount) {
-          console.log('data mismatch: ' + dataAmount + ' requested vs. ' + timeSeries.length + ' received');
+          //console.log('data mismatch: ' + dataAmount + ' requested vs. ' + timeSeries.length + ' received');
         }
 
         /****Instantiate variables for time series data*****/
@@ -193,11 +186,9 @@ function stockInfo(apiKey) {
           var divisor = Math.floor(dataAmount/desiredTicks);
           var dateTicks = dateIndices.filter(d=>d%divisor===0);
           var datesToShow =[];
-          console.log(dateTicks);
           for(var i=0;i<dates.length;i+=divisor) {
             datesToShow.push(dates[i]);
           }
-          console.log(datesToShow);
 
           var layout = {
             hovermode: "x",
@@ -229,7 +220,7 @@ function stockInfo(apiKey) {
           if($('#plotly').length) {
               Plotly.react('plotly',[plot],layout,{displayModeBar: false});
           } else {
-            console.log('Could not insert plot');
+            //console.log('Could not insert plot');
             /**TODO: insert plot error image */
           }
         } else {
@@ -239,7 +230,7 @@ function stockInfo(apiKey) {
       }
     }
     else {
-      console.log('typing active');
+      //console.log('typing active');
     }
   });
 }

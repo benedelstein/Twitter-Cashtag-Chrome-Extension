@@ -19,7 +19,6 @@ $(document).ready(function() {
     if(apiKey.length===16) { // if key is valid
       /*TODO: check if API KEY is actually valid*/
       chrome.storage.sync.set({apiKey: apiKey},function() {
-        console.log('Set user api key to ' + apiKey);
         var newKeyData = 'your current API key: ' + apiKey;
         $('#currentKey').html(newKeyData);
       });
