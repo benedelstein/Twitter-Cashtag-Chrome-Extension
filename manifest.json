@@ -5,6 +5,7 @@
   "description": "See company info, stock price, and price graph for any cashtag on Twitter.",
   "author": "Ben Edelstein",
   "icons": {
+        "48": "images/icon_48.png",
         "128": "images/icon_128.png"
   },
   "background": {
@@ -12,7 +13,7 @@
   },
   "browser_action": {
     "default_icon": {
-      "16": "images/icon_128.png"
+      "16": "images/icon_48.png"
     },
     "default_popup": "popup.html",
     "default_title": "Twitter Cashtag Extension"
