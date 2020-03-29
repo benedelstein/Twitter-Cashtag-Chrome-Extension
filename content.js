@@ -3,7 +3,7 @@ var INIT_DELAY = 1000;
 //check if valid api key exists
 chrome.storage.sync.get(['apiKey'], function(result) {
   if(!result.apiKey) {
-    alert('You haven\'t entered your stocks API key yet. Open the popup to enter it.');
+    alert('You haven\'t entered your stocks API key yet. Open the popup (top right of browser) to enter it.');
   }
   else {
     setTimeout(stockInfo, INIT_DELAY, result.apiKey);
@@ -19,14 +19,56 @@ chrome.runtime.onMessage.addListener(
 });
 
 function stockInfo(apiKey) {
+  var theme;
+  const lightTheme = {
+    trendsDivClass:'css-1dbjc4n r-1u4rsef r-9cbz99 r-t23y2h r-1phboty r-rs99b7 r-ku1wi2 r-1udh08x',
+    bgColor: '#ffffff',
+    textColor: '#212121',
+    borderColor: '#E6ECF0',
+    plotFontColor: '#444',
+    errorFontColor: '#212121',
+    footerColor: '#616161',
+    plotBarColor: '#232323'
+  };
+  const dimTheme = {
+    trendsDivClass: 'css-1dbjc4n r-1uaug3w r-1uhd6vh r-t23y2h r-1phboty r-rs99b7 r-ku1wi2 r-1udh08x',
+    bgColor: 'rgb(21, 32, 43)',
+    textColor: '#ffffff',
+    borderColor: '#37444C',
+    plotFontColor: '#fff',
+    errorFontColor: '#aaaaaa',
+    footerColor: '#aaaaaa',
+    plotBarColor: '#bbbbbb'
+  };
+  const darkTheme = {
+    trendsDivClass: 'css-1dbjc4n r-1ysxnx4 r-k0dy70 r-t23y2h r-1phboty r-rs99b7 r-ku1wi2 r-1udh08x',
+    bgColor: '#000000',
+    textColor: '#ffffff',
+    borderColor: '#2F3336',
+    plotFontColor: '#fff',
+    errorFontColor: '#aaaaaa',
+    footerColor: '#aaaaaa',
+    plotBarColor: '#dddddd'
+  };
+
   $(document).ready(function() { //wait for dom to fully load before doing anything
     if($('#typeaheadDropdown-1').length===0) { //check if typing box is active and don't do anything if so
       $('#stockinfo').remove();
 
-      //insert new div on side bar
-      $("div[class='css-1dbjc4n r-1u4rsef r-9cbz99 r-t23y2h r-1phboty r-rs99b7 r-ku1wi2 r-1udh08x']")
-        .before('<div class="stock_info" id="stockinfo"></div>');
 
+      var bgColor = document.body.style.backgroundColor;
+      if(bgColor=='rgb(255, 255, 255)') { //light mode
+        theme = lightTheme;
+      }
+      else if (bgColor=='rgb(21, 32, 43)') { //dim mode
+        theme = dimTheme;
+      }
+      else { //lights out
+        theme = darkTheme;
+      }
+      $(`div[class="${theme.trendsDivClass}"]`).before('<div class="stock_info" id="stockinfo"></div>');
+      $('#stockinfo').css('background-color',theme.bgColor);
+      $('#stockinfo').css('border-color',theme.borderColor);
       try {
         var stocks = new Stocks(apiKey);
       }
@@ -84,7 +126,8 @@ function stockInfo(apiKey) {
         var headerHtml = companyName + ' (<a href="' + googleUrl +
           '" target="_blank">' + stock + '</a>)'
         $('#stockHeader').append(headerHtml);
-
+        $('#stockHeader').css('color',theme.textColor);
+        $('#stockHeader').css('border-bottom-color',theme.borderColor);
         var globalQuote = await stocks.quoteEndpoint({symbol: stock});
         var gotGlobalQuote; //flag for if we got good quote data
         if(typeof globalQuote=== 'undefined') {
@@ -149,6 +192,7 @@ function stockInfo(apiKey) {
           var priceSpan = '<span id="price" >' + closePrice.toFixed(2) + '</span>';
           var currencySpan = '<span id="currency">' + companyCurrency + '</span>';
           $('#stockPrice').append(priceSpan);
+          $('#price').css('color',theme.textColor);
           $('#stockPrice').append(currencySpan);
           var dailyChangeString = '';
           if(dailyChange>=0) { //format daily change string
@@ -191,6 +235,8 @@ function stockInfo(apiKey) {
           }
 
           var layout = {
+            paper_bgcolor: theme.bgColor,
+            plot_bgcolor: theme.bgColor,
             hovermode: "x",
             height: 180,
             width: 349,
@@ -209,11 +255,12 @@ function stockInfo(apiKey) {
               ticktext: datesToShow.map(d => { return (new Date(d)).toString().substring(4,10);}),
               automargin: true,
               showgrid: false,
-              showline: false
+              color: theme.plotBarColor
             },
             yaxis: {
               nticks: 5,
-              showline: false
+              showline: false,
+              color: theme.plotBarColor
             }
           };
 
@@ -225,8 +272,10 @@ function stockInfo(apiKey) {
           }
         } else {
           $('#plotly').html('<div id="nograph">Could not insert graph<br><p>Wait a minute and try again</p></div>');
+          $('#nograph').css('color',theme.errorFontColor);
         }
         $('#stockinfo').append('<div id="footer">Click on the ticker to get more info from Google Finance</div>');
+        $('#footer').css('color',theme.footerColor);
       }
     }
     else {
