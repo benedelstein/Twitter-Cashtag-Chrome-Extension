@@ -16,7 +16,7 @@
       "16": "images/icon_48.png"
     },
     "default_popup": "popup.html",
-    "default_title": "Twitter Cashtag Extension"
+    "default_title": "What Cashtag?"
   },
   "content_scripts": [
     {
@@ -29,8 +29,8 @@
     }
   ],
   "web_accessible_resources": [
-            "images/alert.png"
-       ],
+    "images/alert.png"
+  ],
   "permissions": [
     "webNavigation",
     "*://twitter.com/*",
