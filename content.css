@@ -44,12 +44,12 @@
 }
 
 #stockHeader a:link {
-  font: inherit;
+  color: inherit;
   text-decoration: none;
 }
 
 #stockHeader a:visited {
-  color: #212121;
+  color: inherit;
   text-decoration: none;
 }
 

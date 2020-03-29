@@ -55,7 +55,6 @@ function stockInfo(apiKey) {
     if($('#typeaheadDropdown-1').length===0) { //check if typing box is active and don't do anything if so
       $('#stockinfo').remove();
 
-
       var bgColor = document.body.style.backgroundColor;
       if(bgColor=='rgb(255, 255, 255)') { //light mode
         theme = lightTheme;
