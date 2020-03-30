@@ -71,12 +71,64 @@ body {
   cursor: pointer;
 }
 
-#currentKey {
+#noKeyMsg {
   margin-top: 7px;
   font-weight: 300;
   font-size: 11px;
-  color: #515151;
+  color: #404040;
   text-align: center;
+}
+
+#keyInfo {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 300;
+  color: #212121;
+  margin-top: 8px;
+}
+
+#firstMessage {
+  margin: 0px;
+}
+
+#apiKey {
+  font-size: 18px;
+  font-weight: normal;
+  margin-top: 3px;
+  margin-bottom: 0px;
+}
+
+#keyIn img {
+  width: 60px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1px;
+}
+
+#reenter {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  vertical-align: middle;
+  color: #ffffff;
+  background-color: #1DA1F2;
+  border-radius: 15px;
+  border-width: 0px;
+  outline: none;
+  height: 24px;
+  width: 86px;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  transition-duration: .4s;
+}
+
+#reenter:hover {
+  text-decoration: none;
+  background-color: #1D59F2;
+  cursor: pointer;
 }
 
 #help {
@@ -85,6 +137,6 @@ body {
   font-weight: 300;
   font-size: 8px;
   margin-top: 12px;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   color: #AEAEAE;
 }

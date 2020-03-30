@@ -11,15 +11,25 @@
         <div id="title">
           <img src="images/icon_128.png" alt="Icon"></img>
         </div>
-        <div id="instructions">
-          <p>1. If you don't have one, get a free stocks API key from <a href="https://www.alphavantage.co/support/#api-key" target="_blank">here</a><p>
-          <p>2. Paste in your API key to the box below!<p>
+        <div id='noKeyYet'>
+          <div id="instructions">
+            <p>1. If you don't have one, get a free stocks API key from <a href="https://www.alphavantage.co/support/#api-key" target="_blank">here</a><p>
+            <p>2. Paste in your API key to the box below!<p>
+          </div>
+          <div id="apiSub">
+            <input id="keyInput"></input>
+            <button id="submitButton">submit</button>
+          </div>
+          <div id="noKeyMsg">
+          </div>
         </div>
-        <div id="apiSub">
-          <input id="keyInput"></input>
-          <button id="submitButton">submit</button>
-        </div>
-        <div id="currentKey">
+        <div id='keyIn'>
+          <img src="images/checkmark.png" alt="check mark"></img>
+          <div id='keyInfo'>
+            <p id='firstMessage'>Your current API key:</p>
+            <p id='apiKey'></p>
+          </div>
+          <button id='reenter'>re-enter key</button>
         </div>
         <div id="help">
           for more information on usage and limits click <a href="https://github.com/benedelstein/Twitter-Finance-Chrome-Extension" target="_blank">here</a>
