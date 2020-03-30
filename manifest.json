@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "What Ca$htag?",
-  "version": "0.3",
+  "name": "What Cashtag?",
+  "version": "1.0",
   "description": "See up to date company info and price data for any cashtag on Twitter.",
   "author": "Ben Edelstein",
   "icons": {
@@ -29,7 +29,8 @@
     }
   ],
   "web_accessible_resources": [
-    "images/alert.png"
+    "images/alert.png",
+    "images/checkmark.png"
   ],
   "permissions": [
     "webNavigation",
