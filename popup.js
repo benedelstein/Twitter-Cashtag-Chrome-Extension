@@ -32,16 +32,16 @@ $(document).ready(function() {
     let apiKey = $('#keyInput').val().trim();
     if(apiKey.length===16) { // if key is valid
       /* TODO: check if API KEY is actually valid */
-      chrome.storage.sync.set({apiKey: apiKey},function() {
+      chrome.storage.sync.set({apiKey: apiKey}, function() {
         var newKeyData = 'your current API key: ' + apiKey;
         $('#noKeyMsg').html(newKeyData);
         $('#apiKey').text(apiKey);
       });
       $('#noKeyYet').hide();
       $('#keyIn').show();
-      $('#keyInput').val('');
+      $('#keyInput').val(''); // clear the text input
       chrome.tabs.query(params, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {message: "keyIn",key:apiKey}); //tell the content script that a valid api key was entered
+        chrome.tabs.sendMessage(tabs[0].id, {message: "keyIn",key: apiKey}); //tell the content script that a valid api key was entered
       });
     } else {
       alert('Looks like you entered an invalid API key! Get one from the link.');

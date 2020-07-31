@@ -6,7 +6,7 @@ chrome.storage.sync.get(['apiKey'], function(result) {
     alert('You haven\'t entered your stocks API key yet. Open the popup (top right of browser) to enter it.');
   }
   else {
-    setTimeout(stockInfo, INIT_DELAY, result.apiKey);
+    setTimeout(stockInfo, INIT_DELAY, result.apiKey); // delay to allow page to load, 3rd arg is argument passed to stockInfo
   }
 });
 
@@ -53,7 +53,7 @@ function stockInfo(apiKey) {
 
   $(document).ready(function() { //wait for dom to fully load before doing anything
     if($('#typeaheadDropdown-1').length===0) { //check if typing box is active and don't do anything if so
-      $('#stockinfo').remove();
+      $('#stockinfo').remove(); // clear the div
 
       var bgColor = document.body.style.backgroundColor;
       if(bgColor=='rgb(255, 255, 255)') { //light mode
@@ -74,8 +74,6 @@ function stockInfo(apiKey) {
       catch (ex) {
         console.log('error '+ ex);
       }
-
-
 
       let fullticker = $("input[aria-label='Search query']").val().trim(); //extract ticker from search bar
       ticker = fullticker.substring(1,fullticker.length).toUpperCase(); //take out $
