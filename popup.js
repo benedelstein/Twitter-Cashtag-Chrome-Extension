@@ -34,6 +34,7 @@ $(document).ready(function() {
       /* TODO: check if API KEY is actually valid */
       chrome.storage.sync.set({apiKey: apiKey}, function() {
         var newKeyData = 'your current API key: ' + apiKey;
+        console.log("key in");
         $('#noKeyMsg').html(newKeyData);
         $('#apiKey').text(apiKey);
       });

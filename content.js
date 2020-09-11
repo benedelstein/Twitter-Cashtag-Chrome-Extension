@@ -1,4 +1,4 @@
-var INIT_DELAY = 1000;
+var INIT_DELAY = 2000;
 
 //check if valid api key exists
 chrome.storage.sync.get(['apiKey'], function(result) {
@@ -6,7 +6,12 @@ chrome.storage.sync.get(['apiKey'], function(result) {
     alert('You haven\'t entered your stocks API key yet. Open the popup (top right of browser) to enter it.');
   }
   else {
-    setTimeout(stockInfo, INIT_DELAY, result.apiKey); // delay to allow page to load, 3rd arg is argument passed to stockInfo
+    if ($("div[aria-label='Timeline: Trending now']").length>0) {
+        // if sidebars are loaded, no need for delay
+        stockInfo(result.apiKey);
+    } else { // wait to load
+        setTimeout(stockInfo, INIT_DELAY, result.apiKey); // delay to allow page to load, 3rd arg is argument passed to stockInfo
+    }
   }
 });
 
@@ -15,10 +20,12 @@ chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.message==="keyIn") {
       stockInfo(request.key);
-    }
+  }
 });
 
+
 function stockInfo(apiKey) {
+  console.log("starting function");
   var theme;
   const lightTheme = {
     trendsDivClass:'css-1dbjc4n r-1u4rsef r-9cbz99 r-t23y2h r-1phboty r-rs99b7 r-ku1wi2 r-1udh08x',
@@ -32,6 +39,7 @@ function stockInfo(apiKey) {
   };
   const dimTheme = {
     trendsDivClass: 'css-1dbjc4n r-1uaug3w r-1uhd6vh r-t23y2h r-1phboty r-rs99b7 r-ku1wi2 r-1udh08x',
+                     // css-1dbjc4n r-1uaug3w r-1uhd6vh r-1ylenci r-1phboty r-rs99b7 r-ku1wi2 r-1udh08x
     bgColor: 'rgb(21, 32, 43)',
     textColor: '#ffffff',
     borderColor: '#37444C',
@@ -52,7 +60,7 @@ function stockInfo(apiKey) {
   };
 
   $(document).ready(function() { //wait for dom to fully load before doing anything
-    if($('#typeaheadDropdown-1').length===0) { //check if typing box is active and don't do anything if so
+    if($("div[id^='typeaheadDropdown']").length===0) { //check if typing box is active and don't do anything if so
       $('#stockinfo').remove(); // clear the div
 
       var bgColor = document.body.style.backgroundColor;
@@ -65,7 +73,8 @@ function stockInfo(apiKey) {
       else { //lights out
         theme = darkTheme;
       }
-      $(`div[class="${theme.trendsDivClass}"]`).before('<div class="stock_info" id="stockinfo"></div>');
+
+      $("div[aria-label='Timeline: Trending now']").parent().parent().parent().parent().before('<div class="stock_info" id="stockinfo"></div>');
       $('#stockinfo').css('background-color',theme.bgColor);
       $('#stockinfo').css('border-color',theme.borderColor);
       try {
@@ -77,7 +86,7 @@ function stockInfo(apiKey) {
 
       let fullticker = $("input[aria-label='Search query']").val().trim(); //extract ticker from search bar
       ticker = fullticker.substring(1,fullticker.length).toUpperCase(); //take out $
-
+      console.log(ticker);
       request(ticker); //call async stocks function
 
       async function request(stock) {
@@ -104,9 +113,15 @@ function stockInfo(apiKey) {
         resulthtml+="<div id='stockPrice'></div>";
         //inject html into page
         $('#stockinfo').html(resulthtml);
-
+        $('#stockHeader').css('color',theme.textColor);
+        $('#stockHeader').css('border-bottom-color',theme.borderColor);
+        $('#stockinfo').append("<div class='loader'></div>");
         //get json info
-        var companyInfo = await stocks.searchEndpoint({keywords: stock});
+        try {
+            var companyInfo = await stocks.searchEndpoint({keywords: stock});
+        } catch(error) {
+            errorMessage();
+        }
         if(typeof companyInfo==='undefined') {
           errorMessage();
           return;
@@ -114,7 +129,7 @@ function stockInfo(apiKey) {
         var companyTicker = companyInfo['1. symbol'];
         var companyName = companyInfo['2. name'];
         var companyCurrency = companyInfo['8. currency'];
-
+        console.log(companyTicker);
         if(companyTicker!==stock) { //autocorrect ticker misspellings
           stock = companyTicker;
         }
@@ -123,11 +138,9 @@ function stockInfo(apiKey) {
         var headerHtml = companyName + ' (<a href="' + googleUrl +
           '" target="_blank">' + stock + '</a>)'
         $('#stockHeader').append(headerHtml);
-        $('#stockHeader').css('color',theme.textColor);
-        $('#stockHeader').css('border-bottom-color',theme.borderColor);
         var globalQuote = await stocks.quoteEndpoint({symbol: stock});
         var gotGlobalQuote; //flag for if we got good quote data
-        if(typeof globalQuote=== 'undefined') {
+        if(typeof globalQuote === 'undefined') {
           gotGlobalQuote = false;
         } else {
           gotGlobalQuote = true;
@@ -140,6 +153,7 @@ function stockInfo(apiKey) {
         amount: dataAmount
         };
         var timeSeries = await stocks.timeSeries(timeSeriesOptions);
+        console.log(timeSeries);
 
         if(timeSeries.length===0 || typeof timeSeries==='undefined') {
           skipGraph = true; //if you don't have time series data you can't graph
@@ -212,7 +226,7 @@ function stockInfo(apiKey) {
             $('#percentChange').css('color','#D23F30');
           }
         }
-
+        $('.loader').hide();
         $('#stockinfo').append('<div id="plotly"></div>');
         if(!skipGraph) {
           var plot = {
@@ -276,12 +290,13 @@ function stockInfo(apiKey) {
       }
     }
     else {
-      //console.log('typing active');
+      console.log('typing active');
     }
   });
 }
 //put message in div when an unresolvable error occurs
 function errorMessage() {
+  $('.loader').hide();
   var alertUrl = chrome.extension.getURL("images/alert.png");
   var alertHtml = `<img class="alertImage" src="${alertUrl}"></img>`;
   $('#stockinfo').html('<div id="error"><h1>error</h1></div>');
